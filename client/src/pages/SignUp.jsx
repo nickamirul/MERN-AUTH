@@ -26,7 +26,7 @@ const SignUp = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
       if (data.success === false) {
         setLoading(false);
         setError(data.message);
@@ -34,14 +34,14 @@ const SignUp = () => {
       }
       setLoading(false);
       setError(null);
-      navigate('/sign -in');
+      navigate('/sign-in');
     } catch (error) {
         setLoading(false);
         setError(error.message); 
     }
   };
 
-  console.log(formData);
+  // console.log(formData);
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -78,7 +78,7 @@ const SignUp = () => {
       </form>
       <div className="flex gap-2 mt-3">
         <p>Have an account?</p>
-        <Link to="sign-in">
+        <Link to="/sign-in">
           <span className="text-blue-700">Sign In</span>
         </Link>
       </div>
