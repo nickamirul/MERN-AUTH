@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
 body {
-     background-color: rgb(241 , 245, 241);
+  background-color: #f9fafb; /* Light gray for a clean, minimalist look */
+  color: #333; /* Dark gray for text to ensure readability */
+  font-family: 'Inter', sans-serif; /* Use a modern, clean font */
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+* {
+  box-sizing: border-box;
 }
