@@ -14,6 +14,8 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { app } from "../firebase";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const Profile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -26,6 +28,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({});
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   //firebase storage code, put this in the firebase console
   // service firebase.storage {
@@ -122,6 +125,10 @@ const Profile = () => {
     setShowSignOutConfirm(false);
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <div className="relative">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -166,13 +173,22 @@ const Profile = () => {
             className="bg-slate-100 outline-none p-3 rounded-lg cursor-not-allowed"
             disabled
           />
-          <input
-            type="password"
-            id="password"
-            placeholder="New Password"
-            className="bg-white outline-none p-3 rounded-lg"
-            onChange={handleChange}
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              placeholder="New Password"
+              className="bg-white outline-none p-3 rounded-lg w-full"
+              onChange={handleChange}
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            >
+              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+            </button>
+          </div>
         </div>
 
         <button
