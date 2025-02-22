@@ -1,6 +1,11 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useRef, useState, useEffect } from "react";
-import { signOut } from "../redux/user/userSlice";
+import { 
+  signOut, 
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import {
   getStorage,
@@ -11,7 +16,7 @@ import {
 import { app } from "../firebase";
 
 const Profile = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const fileRef = useRef(null);
@@ -20,6 +25,7 @@ const Profile = () => {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
 
   //firebase storage code, put this in the firebase console
   // service firebase.storage {
@@ -64,6 +70,33 @@ const Profile = () => {
     );
   };
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+        return;
+      }
+      dispatch(updateUserSuccess(data));
+      setUpdateSuccess(true);
+    } catch (error) {
+      dispatch(updateUserFailure(error.message));
+    }
+  };
+
   const handleSignOutClick = () => {
     setShowSignOutConfirm(true);
   };
@@ -92,7 +125,7 @@ const Profile = () => {
   return (
     <div className="relative">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4 max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md mx-auto">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -104,7 +137,7 @@ const Profile = () => {
           onClick={() => fileRef.current.click()}
           src={formData.avatar || currentUser.avatar}
           alt="profile"
-          className="h-24 w-24 object-cover rounded-full mx-auto"
+          className="h-24 w-24 object-cover rounded-full mx-auto cursor-pointer"
         />
         <p className="text-center">
           {fileUploadError ? (
@@ -113,7 +146,7 @@ const Profile = () => {
           ) : filePercent > 0 && filePercent < 100 ? (
             <span className="text-slate-700">{`Uploading ${filePercent}%`}</span>
           ) : filePercent === 100 ? (
-            <span className="text-green-700">Uploaded successfully</span>
+            <span className="text-green-700">Image uploaded successfully</span>
           ) : (
             ""
           )}
@@ -123,26 +156,39 @@ const Profile = () => {
             type="text"
             id="username"
             defaultValue={currentUser.username}
-            placeholder="Username"
-            className="bg-white outline-none p-3 rounded-lg"
+            className="bg-slate-100 outline-none p-3 rounded-lg cursor-not-allowed"
+            disabled
           />
           <input
-            type="text"
+            type="email"
             id="email"
             defaultValue={currentUser.email}
-            placeholder="Email"
-            className="bg-white outline-none p-3 rounded-lg"
+            className="bg-slate-100 outline-none p-3 rounded-lg cursor-not-allowed"
+            disabled
           />
           <input
-            type="text"
+            type="password"
             id="password"
-            placeholder="Password"
+            placeholder="New Password"
             className="bg-white outline-none p-3 rounded-lg"
+            onChange={handleChange}
           />
         </div>
-        <button className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-95">
-          Update
+
+        <button
+          disabled={loading}
+          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+        >
+          {loading ? 'Loading...' : 'Update'}
         </button>
+
+        {error && (
+          <p className="text-red-700 text-center">{error}</p>
+        )}
+
+        {updateSuccess && (
+          <p className="text-green-700 text-center">User is updated successfully!</p>
+        )}
       </form>
       <div className="flex justify-between max-w-md mx-auto my-5">
         <span className="text-red-700 cursor-pointer">Delete Account</span>
