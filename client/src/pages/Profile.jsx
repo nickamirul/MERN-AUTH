@@ -1,5 +1,7 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useRef, useState, useEffect } from "react";
+import { signOut } from "../redux/user/userSlice";
+import { useNavigate } from "react-router-dom";
 import {
   getStorage,
   ref,
@@ -10,6 +12,8 @@ import { app } from "../firebase";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
   const [filePercent, setFilePercent] = useState(0);
@@ -57,6 +61,23 @@ const Profile = () => {
         );
       }
     );
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+      dispatch(signOut());
+      navigate('/sign-in');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -116,7 +137,12 @@ const Profile = () => {
       </form>
       <div className="flex justify-between max-w-md mx-auto my-5">
         <span className="text-red-700 cursor-pointer">Delete Account</span>
-        <span className="text-red-700 cursor-pointer">Sign Out</span>
+        <span 
+          onClick={handleSignOut}
+          className="text-red-700 cursor-pointer"
+        >
+          Sign Out
+        </span>
       </div>
     </div>
   );
