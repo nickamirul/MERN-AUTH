@@ -43,7 +43,7 @@ const SignIn = () => {
   // console.log(formData);
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-gray-50 min-h-screen">
+    <div className="p-6 max-w-lg mx-auto bg-gray-50 min-h-screen mt-16">
       <h1 className="text-3xl text-center font-semibold my-7 text-gray-800">Sign In</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow-md">
         <input
